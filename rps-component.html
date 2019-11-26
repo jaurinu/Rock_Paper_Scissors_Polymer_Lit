@@ -1,0 +1,114 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="rps-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+    <counter><span id="user-stats">[[userCounter]]</span>:<span id="computer-stats">[[computerCounter]]</span></counter>
+    <p><span>Computer choice</span></p>
+    <button id="rock">Rock</button>
+    <button id="paper">Paper </button>
+    <button id="scissors">Scissors</button>
+  </template>
+
+  <script>
+    /**
+     * `rps-component`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class RpsComponent extends Polymer.Element {
+      static get is() { return 'rps-component'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'rps-component'
+          },
+          computerChoice: {
+            type: String,
+            value: ''
+          },
+          userCounter: {
+            type: Number,
+            value: 0,
+            notify: true
+          },
+          computerCounter: {
+            type: Number,
+            value: 0,
+            notify: true
+          }
+        };
+      }
+
+      resultWin(userChoice, computerChoice){
+        this.userCounter++
+        console.log("win " + userChoice,  computerChoice)
+      }
+      
+      resultLose(userChoice, computerChoice){
+        this.computerCounter++
+        console.log("lose " + userChoice,  computerChoice)
+      }
+
+      resultDraw(userChoice, computerChoice){
+        console.log("draw " + userChoice,  computerChoice)
+      }
+
+      getRandomChoice(){
+        const randomNumber = (Math.floor(Math.random() * 3  + 1))
+        //console.log("comp" + randomNumber)
+        switch (randomNumber){
+          case 1: this.computerChoice= "rock"
+          break;
+          case 2: this.computerChoice= "paper"
+          break;
+          case 3: this.computerChoice= "scissors"
+          break;
+        }
+        return this.computerChoice
+      }    
+       
+      gameState(userChoice){
+        const computerChoice = this.getRandomChoice()
+        console.log("user " + "computer")
+        console.log(userChoice,  computerChoice)
+        switch(userChoice + " vs " + computerChoice){
+          case "rock vs scissors": 
+          case "paper vs rock":
+          case "scissors vs paper":
+            this.resultWin(userChoice, computerChoice);
+          break;
+          case "rock vs paper": 
+          case "paper vs scissors":
+          case "scissor vs rock":
+            this.resultLose(userChoice, computerChoice);
+          break;
+          case "rock vs rock": 
+          case "paper vs paper":
+          case "scissor vs scissor":
+            this.resultDraw(userChoice, computerChoice);
+          break;
+        }
+      }
+
+      ready() {
+      super.ready();
+      this.addEventListener('click', (event) => {
+      //console.log(event.path[0].id);
+      this.gameState(event.path[0].id)
+      })
+      } 
+    }
+
+    window.customElements.define(RpsComponent.is, RpsComponent);
+  </script>
+</dom-module>
