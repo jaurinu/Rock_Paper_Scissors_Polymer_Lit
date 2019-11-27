@@ -10,9 +10,18 @@
     <h2>Hello [[prop1]]!</h2>
     <counter><span id="user-stats">[[userCounter]]</span>:<span id="computer-stats">[[computerCounter]]</span></counter>
     <p><span>Computer choice</span></p>
-    <button id="rock">Rock</button>
-    <button id="paper">Paper </button>
-    <button id="scissors">Scissors</button>
+    <!-- <span><img src="/assets/61CD2t4VmDL.png"></span> -->
+    <button id="rock" class="choicesGame" value="rock" on-click="handleClick">Rock</button>
+    <button id="paper" class="choicesGame" value="paper"  on-click="handleClick">Paper </button>
+    <button id="scissors" class="choicesGame" value="scissors"  on-click="handleClick">Scissors</button>
+    <button id="restart" on-click="restartScore">Reiniciar rondas</button>
+    <button id="reset" on-click="resetStats">Restablecer estadisticas</button>
+    <p>Round</p>
+    <p><span>[[roundStats]]</span></p>
+    <p>Highscore</p>
+    <p><span>[[highScoreStats]]</span></p>
+   
+
   </template>
 
   <script>
@@ -32,6 +41,9 @@
             type: String,
             value: 'rps-component'
           },
+          listeners: {
+          'click': 'handleClick',
+        },
           computerChoice: {
             type: String,
             value: ''
@@ -45,12 +57,57 @@
             type: Number,
             value: 0,
             notify: true
+          },
+          scoreStats: {
+            type: Number,
+            value: 0
+          },
+          roundStats: {
+            type: Number,
+            value: 0
+          },
+          highScoreStats: {
+            type: Number,
+            value: 0
           }
         };
       }
 
+
+      resetStats(){
+        localStorage.clear("HighScoreStats")
+        this.highScoreStats = 0
+        this.userCounter = 0
+        this.computerCounter = 0
+        this.roundStats = 0
+      }
+
+      saveLocalStorage() {
+        localStorage.setItem("HighScoreStats", this.highScoreStats)
+      }
+
+      saveHighscoreStats(){
+        if(this.highScoreStats < this.scoreStats) {
+          this.highScoreStats = this.scoreStats
+        }
+      this.saveLocalStorage()
+      }
+
+      restartScore(){
+        this.userCounter = 0
+        this.computerCounter = 0
+        this.roundStats = 0
+         console.info( 'restart score was clicked.');
+        this.saveHighscoreStats()
+      }
+
+      saveRoundStats() {
+        this.roundStats++
+      }
+
       resultWin(userChoice, computerChoice){
         this.userCounter++
+        this.scoreStats = this.userCounter
         console.log("win " + userChoice,  computerChoice)
       }
       
@@ -89,23 +146,29 @@
           break;
           case "rock vs paper": 
           case "paper vs scissors":
-          case "scissor vs rock":
+          case "scissors vs rock":
             this.resultLose(userChoice, computerChoice);
           break;
           case "rock vs rock": 
           case "paper vs paper":
-          case "scissor vs scissor":
+          case "scissors vs scissors":
             this.resultDraw(userChoice, computerChoice);
           break;
         }
       }
+   
+      handleClick(e){
+      this.gameState(e.currentTarget.value)
+      this.saveRoundStats()
+      }
 
       ready() {
       super.ready();
-      this.addEventListener('click', (event) => {
-      //console.log(event.path[0].id);
-      this.gameState(event.path[0].id)
-      })
+       if (localStorage){
+         this.highScoreStats = localStorage.getItem("HighScoreStats")
+       }else{
+         this.highScoreStats = 0
+       }
       } 
     }
 
